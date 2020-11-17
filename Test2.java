@@ -1,263 +1,206 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.*;
-import java.util.*;
-public class LexemeTester {
-	public static void main(String[] args) {
-		File myFile = new File("src/question1.txt");
-		ArrayList<LexemeTester> tokens = new ArrayList<LexemeTester>();
-		
-		try{
-            BufferedReader reader = new BufferedReader(new FileReader(myFile));
-            String lineNow = reader.readLine();
-            String fromthefile = "";
-            while(lineNow != null){
-                for(int i = 0; i < lineNow.length();i++){
-                    char x = lineNow.charAt(i);
-                    fromthefile += x;
-                }
-            }
+import java.util.ArrayList;
 
-            tokens = getMeSomeTokens(fromthefile);
+public class Test2 {
+    public static void main(String[] args){
+        ArrayList<Test2> tokens = new ArrayList<Test2>();
+        File file = new File("Q1.txt");
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String fileAsString = null;
+            while((fileAsString = reader.readLine()) != null){
+                tokens.addAll(createArrayOfTokens(fileAsString));
+            }
         }
         catch(Exception f){
             System.out.println(f);
         }
-		
-	}
-		
-	public static ArrayList<LexemeTester> getMeSomeTokens(String s) {
-		ArrayList<LexemeTester> tokens = new ArrayList<LexemeTester>(); 
-		ArrayList<Character> chars = new ArrayList<Character>();
-			for (char c : s.toCharArray()) {
-			  chars.add(c);
-			}
-	    	  for(int i=0; i<chars.size(); i++) {
-	        	  char x = chars.get(i);
-	               
-	        	  //Perl style identifiers
-	        	  if(x == '$' || x == '%' || x == '@') {
-	        		  for(int j=i+1; j<chars.size(); j++) {
-	        			  String holdMe = "";
-	            		  char y = chars.get(j);
-	            		  if(y != '*') {
-	            			  holdMe += y;
-	            			  continue;
-	            		  }
-	            		  else {
-		            		  LexemeTester token = new LexemeTester(holdMe,"Perl");
-		            		  tokens.add(token);
-		            		  continue;
-	            		  }
-	        		  }
-	              }
-
-	              //Java-Style string literals
-	              if(x == '<') {	            	   
-	            	  for(int j=i+1; j<chars.size(); j++) {
-	            		  String holdMe = "";
-	            		  char y = chars.get(j);
-	            		  if(y != '<' ) {
-	            			  holdMe += y;
-	            			  continue;
-	            		  }
-	            		  else {
-	            			  LexemeTester token = new LexemeTester(holdMe,"Java Style String Literal");
-		            		  tokens.add(token);
-		            		  continue;
-	            		  }
-	            	  }
-	              }
-
-	              //C-Style integer literals
-	              if(x == '#') {            	   
-	            	  for(int j=i+1; j<chars.size(); j++) {
-	            		  String holdMe = "";
-	            		  char y = chars.get(j);
-	            		   
-	            		  if(Character.isDigit(y) == true) {
-	            			  holdMe += y;
-	            			  continue;
-	            		  }
-	            		   
-	            		  if(Character.toString(y).matches("[A-F?]") || Character.toString(y).matches("[a-f?]")) {
-	            			  holdMe += y;
-	            			  continue;
-	            		  }
-	            		   
-	            		  else {
-	            			  LexemeTester token = new LexemeTester(holdMe,"C Style Integer Literal");
-		            		  tokens.add(token);
-		            		  continue;
-	            		  }
-	            		   
-	            	  }
-	              }
-
-	               
-	              //C-Style character literals
-	              if(x == '\'') {	            	   
-	            	  for(int j=i+1; j<chars.size(); j++) {
-	            		  String holdMe = "";
-	            		  char y = chars.get(j);  
-	            		   
-	            		  if(y != '\'') {
-	            			  holdMe += y;
-	            			  continue;
-	            		  }
-	            		  
-	            		  else {
-	            			  LexemeTester token = new LexemeTester(holdMe,"C Style Character Literal");
-		            		  tokens.add(token);
-		            		  continue;
-	            		  }
-	            		   
-	            		  }
-	            	  }
-	               
-	              //C-Style floating point literals
-	              if(x == '.') {	            	   
-	            	  for(int j=i+1; j<chars.size(); j++) {
-	            		  String holdMe = "";
-	            		  char y = chars.get(j);
-	            		   
-	            		  if(y != '.') {
-	            			  holdMe += y;
-	            			  continue;
-	            		  }
-	            		  
-	            		  else {
-	            			  LexemeTester token = new LexemeTester(holdMe,"C Style Floating Point Literal");
-		            		  tokens.add(token);
-		            		  continue;
-	            		  }
-	            		   
-	            		  }
-
-	            	  }
-	               
-	              //Addition or Increment
-	              if(x == '+') {
-	            	  if(chars.get(i+1) == '+') {
-	            		  LexemeTester token = new LexemeTester("++","Increment");
-	            		  tokens.add(token);
-	            		  continue;
-	            	  }
-	            	   
-	            	  else {
-	            		  LexemeTester token = new LexemeTester("+","Addition");
-	            		  tokens.add(token);
-	            		  continue;
-	            	  }
-	              }
-	               
-	              // Assignment
-	              if(x == '=') {
-	            	  LexemeTester token = new LexemeTester("=","Assignment");
-            		   tokens.add(token); 
-            		   continue;
-	              }
-	               
-	              //Subtraction or Decrement
-	              if(x == '-') {
-	            	  if(chars.get(i+1) == '-') {
-	            		  LexemeTester token = new LexemeTester("--","Decrement");
-	            		  tokens.add(token);
-	            		  continue;
-	            	  }
-	            	   
-	            	  else {
-	            		  LexemeTester token = new LexemeTester("-","Subtraction");
-	            		  tokens.add(token);
-	            		  continue;
-	            	  }
-	              }
-
-	              // Division
-	              if(x == '/') {
-	            	  LexemeTester token = new LexemeTester("/","Division");
-            		   tokens.add(token);
-            		   continue;
-	              }
-
-	              // Multiplication
-	              if(x == '*') {
-	            	  LexemeTester token = new LexemeTester("*","Multiplication");
-            		   tokens.add(token); 
-            		   continue;
-	              }
-
-	              // Modulo
-	              if(x == '%') {
-	            	  LexemeTester token = new LexemeTester("%","Modulo");
-            		   tokens.add(token);  
-            		   continue;
-	              }
-
-	              // Logical NOT
-	              if(x == '!') {
-	            	  LexemeTester token = new LexemeTester("!","Logical Not");
-            		   tokens.add(token);
-            		   continue;
-	              }
-
-	              // Logical OR
-	              if(x == '|') {
-	            	  if(chars.get(i+1) == '|') {
-	            		  LexemeTester token = new LexemeTester("||","Logical Or");
-	            		  tokens.add(token);
-	            		  continue;
-	            	  }
-	              }
-
-	              // Logical AND
-	              if(x == '&') {
-	            	  if(chars.get(i+1) == '&') {
-	            		  LexemeTester token = new LexemeTester("&&","Logical And");
-	            		  tokens.add(token);
-	            		  continue;
-	            	  } 
-	              }
-
-	              // Open code block
-	              if(x == '{') {
-	            	  LexemeTester token = new LexemeTester("{","Open Code Block");
-            		   tokens.add(token);
-            		   continue;
-	              }
-	               
-	              // Close code block
-	              if(x == '}') {
-	            	  LexemeTester token = new LexemeTester("}","Close Code Block");
-	            	  tokens.add(token);
-	            	  continue;
-	              }
-	               
-	              // Open Function parameter
-	              if(x == '(') {
-	            	  LexemeTester token = new LexemeTester("(","Open Function Parameter");
-	            	  tokens.add(token); 
-	            	  continue;
-	              }
-	               
-	              // Close Function parameter
-	              if(x == ')') {
-	            	  LexemeTester token = new LexemeTester("(","Close Function Parameter");
-	            	  tokens.add(token); 
-	            	  continue;
-	              }
-	               
-	               
-	    	  }//for loop end
-	    	   
-	    	  return tokens;
-	    	   
-	}//end of getMeSomeTokens 
-
-	
-	public LexemeTester (String token, String tokenName){
-        token = "";
-        tokenName = "";
     }
+
+    //Creates object for all the non-alphanumeric tokens found
+    public Test2(String token, String name){
+        token = " ";
+        name = " ";
+    }
+
+    //Creates the list of tokens
+    public static ArrayList<Test2> createArrayOfTokens (String test){
+        ArrayList<Test2> foundTokens = new ArrayList<Test2>();
+        char[] testChar = test.toCharArray();
+        for(int i = 0; i < testChar.length;i++){
+            if(testChar[i] == '$' || testChar[i] == '@'){
+                foundTokens.add(getPerlId(testChar,i));
+                continue;
+            }
+            if(testChar[i] == '"' || testChar[i] == '\''){
+                foundTokens.add(getStringAndCharLit(testChar,i));
+                continue;
+            }
+            if(Character.isDigit(testChar[i])){
+                foundTokens.add(getIntOrFloat(testChar,i));
+                continue;
+            }
+            if(Character.isWhitespace(testChar[i])){
+                continue;
+            }
+            if(testChar[i] == '+'){
+                if(testChar[i+1] == '+'){
+                    Test2 object = new Test2("++","increment");
+                    foundTokens.add(object);
+                    continue;
+                }
+                else{
+                    Test2 object = new Test2("+","addition");
+                    foundTokens.add(object);
+                    continue;
+                }
+            }
+
+            if(testChar[i] == '-'){
+                if(testChar[i+1] == '-'){
+                    Test2 object = new Test2("--","decrement");
+                    foundTokens.add(object);
+                    continue;
+                }
+                else if(testChar[i+1] == '>'){
+                    Test2 object = new Test2("->","assignment");
+                    foundTokens.add(object);
+                    continue;
+                }
+                else{
+                    Test2 object = new Test2("--","subtraction");
+                    foundTokens.add(object);
+                    continue;
+                }
+            }
+
+            if(testChar[i] == '/'){
+                Test2 object = new Test2("/","division");
+                foundTokens.add(object);
+                continue;
+            }
+
+            if(testChar[i] == '*'){
+                Test2 object = new Test2("*","multiplication");
+                foundTokens.add(object);
+                continue;
+            }
+
+            if(testChar[i] == '%'){
+                Test2 object = new Test2("%","modulo");
+                foundTokens.add(object);
+                continue;
+            }
+
+            if(testChar[i] == '&'){
+                if(testChar[i+1] == '&'){
+                    Test2 object = new Test2("&&","logicalAndOp");
+                    foundTokens.add(object);
+                    continue;
+                }
+                else if(!Character.isWhitespace(testChar[i+1])){
+                    errorHandling();
+                }
+            }
+
+            if(testChar[i] == '|'){
+                if(testChar[i+1] == '|'){
+                    Test2 object = new Test2("||","logicalOrOp");
+                    foundTokens.add(object);
+                }
+                else{
+                    errorHandling();
+                }
+            }
+
+            if(testChar[i] == '`'){
+                Test2 object = new Test2("`","negationOp");
+                foundTokens.add(object);
+            }
+
+            if(testChar[i] == '{'){
+                Test2 object = new Test2("{","openCodeBracket");
+                foundTokens.add(object);
+            }
+
+            if(testChar[i] == '}'){
+                Test2 object = new Test2("}","closeCodeBracket");
+                foundTokens.add(object);
+            }
+
+            if(testChar[i] == '('){
+                Test2 object = new Test2("(","openFunctionParameter");
+                foundTokens.add(object);
+            }
+
+            if(testChar[i] == ')'){
+                Test2 object = new Test2(")","closeFunctionParameter");
+                foundTokens.add(object);
+            }
+        }
+        return foundTokens;
+    }
+
+    public static Test2 getPerlId(char[] array, int index){
+        String name = "";
+        int currentIndex = index;
+
+        while(!Character.isWhitespace(array[currentIndex])){
+            name += array[currentIndex];
+            currentIndex++;
+        }
+        Test2 object = new Test2(name,"perlIdentifier");
+        return object;
+    }
+
+    public static Test2 getStringAndCharLit(char[] array, int index){
+        String name = "";
+        int currentIndex = index;
+        Test2 object = new Test2("","");
+
+        while(array[currentIndex] != '"' || array[currentIndex] != '\''){
+            name += array[currentIndex];
+            currentIndex++;
+        }
+
+        if(array[currentIndex] == '"'){
+            object = new Test2(name,"javaStringLit");
+        }
+        else if(array[currentIndex] == '\''){
+            object = new Test2(name,"cCharLit");
+        }
+
+        return object;
+    }
+
+    public static Test2 getIntOrFloat(char[] array, int index){
+        String name = "";
+        int currentIndex = index;
+        boolean isFloat = false;
+        Test2 object = new Test2("","");
+
+        while(Character.isDigit(array[currentIndex]) || array[currentIndex] == '.'){
+            if(array[currentIndex] == '.'){
+                isFloat = true;
+            }
+            name += array[currentIndex];
+            currentIndex++;
+        }
+
+        if(isFloat == true){
+            object = new Test2(name,"floatNum");
+        }
+        else if( isFloat == false){
+            object = new Test2(name, "intNum");
+        }
+        return object;
+    }
+
+    public static void errorHandling(){
+        System.out.print("Invalid token");
+    }
+
+
 }
